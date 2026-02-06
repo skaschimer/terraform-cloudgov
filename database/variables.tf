@@ -26,9 +26,3 @@ variable "json_params" {
   default     = null
   # See options at https://cloud.gov/docs/services/relational-database/#setting-optional-parameters-1
 }
-
-variable "prevent_destroy" {
-  description = "Whether or not to set this resource as protected"
-  type        = bool
-  default     = false
-}

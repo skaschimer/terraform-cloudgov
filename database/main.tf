@@ -20,6 +20,6 @@ resource "cloudfoundry_service_instance" "rds" {
   parameters   = var.json_params
 
   lifecycle {
-    prevent_destroy = [prevent_destroy_rds.trigger]
+    prevent_destroy = true
   }
 }
