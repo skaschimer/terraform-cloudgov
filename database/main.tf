@@ -7,10 +7,6 @@ data "cloudfoundry_service_plans" "rds" {
   service_offering_name = "aws-rds"
 }
 
-resource "prevent_destroy_rds" "trigger" {
-  input = var.prevent_destroy
-}
-
 resource "cloudfoundry_service_instance" "rds" {
   name         = var.name
   space        = var.cf_space_id
