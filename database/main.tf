@@ -14,4 +14,8 @@ resource "cloudfoundry_service_instance" "rds" {
   service_plan = data.cloudfoundry_service_plans.rds.service_plans.0.id
   tags         = local.tags
   parameters   = var.json_params
+
+  lifecycle {
+    prevent_destroy = var.prevent_destroy
+  }
 }
