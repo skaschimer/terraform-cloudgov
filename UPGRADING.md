@@ -64,6 +64,46 @@ Follow the steps in the [cloudfoundry provider migration guide](https://github.c
 1. Run: `terraform import module.database.cloudfoundry_service_instance.rds ID_FROM_STEP_3`
 1. Run: `terraform apply` to fill in new computed attributes
 
+## Database: `prevent_destroy` support
+
+The database module now supports a `prevent_destroy` variable (default: `false`) that prevents accidental destruction of the database service instance.
+
+### Upgrading existing databases (default behavior, `prevent_destroy = false`)
+
+No action required. The module includes a `moved` block that automatically migrates state from `cloudfoundry_service_instance.rds` to `cloudfoundry_service_instance.rds[0]`. Run `terraform plan` and verify you see only a state address change with zero infrastructure modifications, then `terraform apply`.
+
+### Enabling protection on an existing database (`prevent_destroy = true`)
+
+> ⚠️ **WARNING:** You **must** perform the manual state move below **before** running `terraform plan`. If you skip this step, Terraform will plan to **destroy** the existing database and create a new one. The `terraform plan` output will clearly show `1 to destroy, 1 to add` — always review plans carefully.
+
+1. Update your module source ref to the new version.
+2. Set `prevent_destroy = true` in your module call.
+3. **Before running `terraform plan`**, move the state (replace `<NAME>` with your module's name, e.g., `workflow-db`, `database`):
+
+    ```bash
+    terraform state mv \
+      'module.<NAME>.cloudfoundry_service_instance.rds' \
+      'module.<NAME>.cloudfoundry_service_instance.rds_protected[0]'
+    ```
+
+4. Run `terraform plan` and confirm zero infrastructure changes.
+5. Run `terraform apply`.
+
+### Enabling protection on a database that already upgraded with the default
+
+If you previously upgraded with `prevent_destroy = false` (the default) and later want to enable protection:
+
+1. Set `prevent_destroy = true` in your module call.
+2. Move the state:
+
+    ```bash
+    terraform state mv \
+      'module.<NAME>.cloudfoundry_service_instance.rds[0]' \
+      'module.<NAME>.cloudfoundry_service_instance.rds_protected[0]'
+    ```
+
+3. Run `terraform plan`, confirm zero changes, and `terraform apply`.
+
 ## Module Changes
 
 ### Common Changes

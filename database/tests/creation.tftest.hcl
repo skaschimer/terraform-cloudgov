@@ -13,34 +13,72 @@ variables {
 
 run "test_db_creation" {
   override_resource {
-    target = cloudfoundry_service_instance.rds
+    target = cloudfoundry_service_instance.rds[0]
     values = {
       id = "f6925fad-f9e8-4c93-b69f-132438f6a2f4"
     }
   }
 
   assert {
-    condition     = cloudfoundry_service_instance.rds.id == output.instance_id
+    condition     = cloudfoundry_service_instance.rds[0].id == output.instance_id
     error_message = "Instance ID output must match the service instance"
   }
 
   assert {
-    condition     = cloudfoundry_service_instance.rds.service_plan == data.cloudfoundry_service_plans.rds.service_plans.0.id
+    condition     = cloudfoundry_service_instance.rds[0].service_plan == data.cloudfoundry_service_plans.rds.service_plans.0.id
     error_message = "Service Plan should match the rds_plan_name variable"
   }
 
   assert {
-    condition     = cloudfoundry_service_instance.rds.name == var.name
+    condition     = cloudfoundry_service_instance.rds[0].name == var.name
     error_message = "Service instance name should match the name variable"
   }
 
   assert {
-    condition     = cloudfoundry_service_instance.rds.tags == tolist(var.tags)
+    condition     = cloudfoundry_service_instance.rds[0].tags == tolist(var.tags)
     error_message = "Service instance tags should match the tags variable"
   }
 
   assert {
-    condition     = cloudfoundry_service_instance.rds.parameters == "{\"backup_retention_period\":30}"
+    condition     = cloudfoundry_service_instance.rds[0].parameters == "{\"backup_retention_period\":30}"
+    error_message = "Service instance json_params should be configurable"
+  }
+}
+
+run "test_protected_db_creation" {
+  variables {
+    prevent_destroy = true
+  }
+
+  override_resource {
+    target = cloudfoundry_service_instance.rds_protected[0]
+    values = {
+      id = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+    }
+  }
+
+  assert {
+    condition     = cloudfoundry_service_instance.rds_protected[0].id == output.instance_id
+    error_message = "Instance ID output must match the protected service instance"
+  }
+
+  assert {
+    condition     = cloudfoundry_service_instance.rds_protected[0].service_plan == data.cloudfoundry_service_plans.rds.service_plans.0.id
+    error_message = "Service Plan should match the rds_plan_name variable"
+  }
+
+  assert {
+    condition     = cloudfoundry_service_instance.rds_protected[0].name == var.name
+    error_message = "Service instance name should match the name variable"
+  }
+
+  assert {
+    condition     = cloudfoundry_service_instance.rds_protected[0].tags == tolist(var.tags)
+    error_message = "Service instance tags should match the tags variable"
+  }
+
+  assert {
+    condition     = cloudfoundry_service_instance.rds_protected[0].parameters == "{\"backup_retention_period\":30}"
     error_message = "Service instance json_params should be configurable"
   }
 }
