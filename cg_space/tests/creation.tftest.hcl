@@ -45,13 +45,13 @@ run "test_manager_only" {
 
 run "test_individual_permissions" {
   variables {
-    managers   = ["paul.hirsch@gsa.gov"]
+    managers   = ["anna.mercer@gsa.gov"]
     developers = ["ryan.ahearn@gsa.gov"]
     auditors   = ["zachary.rollyson@gsa.gov"]
   }
 
   assert {
-    condition     = keys(cloudfoundry_space_role.managers) == ["paul.hirsch@gsa.gov"]
+    condition     = keys(cloudfoundry_space_role.managers) == ["anna.mercer@gsa.gov"]
     error_message = "Should be able to set Space Managers"
   }
 
@@ -68,7 +68,7 @@ run "test_individual_permissions" {
 
 run "test_deployer_permissions" {
   variables {
-    developers = ["paul.hirsch@gsa.gov"]
+    developers = ["anna.mercer@gsa.gov"]
     deployers  = ["ryan.ahearn@gsa.gov"]
   }
 
@@ -78,13 +78,13 @@ run "test_deployer_permissions" {
   }
 
   assert {
-    condition     = keys(cloudfoundry_space_role.developers) == ["paul.hirsch@gsa.gov", "ryan.ahearn@gsa.gov"]
+    condition     = keys(cloudfoundry_space_role.developers) == ["anna.mercer@gsa.gov", "ryan.ahearn@gsa.gov"]
     error_message = "Should set Space Developers to var.developers + var.deployers"
   }
 
   assert {
     condition = output.developer_role_ids == {
-      "paul.hirsch@gsa.gov" = cloudfoundry_space_role.developers["paul.hirsch@gsa.gov"].id,
+      "anna.mercer@gsa.gov" = cloudfoundry_space_role.developers["anna.mercer@gsa.gov"].id,
       "ryan.ahearn@gsa.gov" = cloudfoundry_space_role.developers["ryan.ahearn@gsa.gov"].id
     }
     error_message = "Output includes the developer role ids"
