@@ -33,7 +33,8 @@ variable "prevent_destroy" {
     production or other persistent environments.
 
     IMPORTANT: Enabling this on an existing database requires a manual state
-    migration step BEFORE running terraform plan. See UPGRADING.md for details.
+    migration step BEFORE running terraform plan. See UPGRADING.md for details:
+    https://github.com/GSA-TTS/terraform-cloudgov/blob/main/UPGRADING.md#database-prevent_destroy-support
   EOT
   type        = bool
   default     = false

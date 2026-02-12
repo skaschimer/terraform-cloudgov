@@ -37,7 +37,8 @@ resource "cloudfoundry_service_instance" "rds_protected" {
 # destroy the existing instance and create a new one.
 #
 # If setting prevent_destroy = true on an existing database, you must manually run
-# `terraform state mv` BEFORE planning. See UPGRADING.md for details.
+# `terraform state mv` BEFORE planning. See UPGRADING.md for details:
+# https://github.com/GSA-TTS/terraform-cloudgov/blob/main/UPGRADING.md#database-prevent_destroy-support
 moved {
   from = cloudfoundry_service_instance.rds
   to   = cloudfoundry_service_instance.rds[0]
