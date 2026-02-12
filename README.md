@@ -15,14 +15,15 @@ Creates an RDS database based on the `rds_plan_name` variable and outputs the `i
 
 ```
 module "database" {
-  source = "github.com/GSA-TTS/terraform-cloudgov//database?ref=v2.4.0"
+  source = "github.com/GSA-TTS/terraform-cloudgov//database?ref=v2.5.0"
 
-  cf_space_id   = data.cloudfoundry_space.app_space.id
-  name          = "database_name"
-  rds_plan_name = "micro-psql"
-  tags          = ["tag1", "tag2"]
+  cf_space_id     = data.cloudfoundry_space.app_space.id
+  name            = "database_name"
+  rds_plan_name   = "micro-psql"
+  prevent_destroy = (var.environment_name == "production")
+  tags            = ["tag1", "tag2"]
   # See options at https://cloud.gov/docs/services/relational-database/#setting-optional-parameters-1
-  json_params   = jsonencode(
+  json_params = jsonencode(
     {
       "storage" : 10,
     }
@@ -30,13 +31,16 @@ module "database" {
 }
 ```
 
+> [!WARNING]
+> See [UPGRADING.md](./UPGRADING.md#database-prevent_destroy-support) for information on enabling `prevent_destroy = true` on an existing database.
+
 ### redis
 
 Creates a Elasticache redis instance and outputs the `instance_id` for use elsewhere.
 
 ```
 module "redis" {
-  source = "github.com/GSA-TTS/terraform-cloudgov//redis?ref=v2.4.0"
+  source = "github.com/GSA-TTS/terraform-cloudgov//redis?ref=v2.5.0"
 
   cf_space_id     = data.cloudfoundry_space.app_space.id
   name            = "redis_name"
@@ -57,7 +61,7 @@ Creates an s3 bucket and outputs the `bucket_id` for use elsewhere.
 
 ```
 module "s3" {
-  source = "github.com/GSA-TTS/terraform-cloudgov//s3?ref=v2.4.0"
+  source = "github.com/GSA-TTS/terraform-cloudgov//s3?ref=v2.5.0"
 
   cf_space_id = data.cloudfoundry_space.app_space.id
   name        = "${local.app_name}-s3-${local.env}"
@@ -81,7 +85,7 @@ Note that the domain must be created in cloud.gov by an OrgManager before this m
 
 ```
 module "domain" {
-  source = "github.com/GSA-TTS/terraform-cloudgov//domain?ref=v2.4.0"
+  source = "github.com/GSA-TTS/terraform-cloudgov//domain?ref=v2.5.0"
 
   cf_org_name   = local.cf_org_name
   cf_space      = data.cloudfoundry_space.app_space
@@ -103,7 +107,7 @@ Notes:
 
 ```
 module "clamav" {
-  source = "github.com/GSA-TTS/terraform-cloudgov//clamav?ref=v2.4.0"
+  source = "github.com/GSA-TTS/terraform-cloudgov//clamav?ref=v2.5.0"
 
   cf_org_name    = local.cf_org_name
   cf_space_name  = local.cf_space_name
@@ -118,7 +122,7 @@ module "clamav" {
 }
 ```
 
-See <UPGRADING.md> for an example of how to set up network policies to reach the clamav app from the client apps.
+See [UPGRADING.md](./UPGRADING.md#clamav) for an example of how to set up network policies to reach the clamav app from the client apps.
 
 ### cg_space
 
@@ -132,7 +136,7 @@ Creates a new cloud.gov space, such as when creating an egress space, and output
 
 ```
 module "egress_space" {
-  source = "github.com/GSA-TTS/terraform-cloudgov//cg_space?ref=v2.4.0"
+  source = "github.com/GSA-TTS/terraform-cloudgov//cg_space?ref=v2.5.0"
 
   cf_org_name   = local.cf_org_name
   cf_space_name = "${local.cf_space_name}-egress"
@@ -164,7 +168,7 @@ Prerequite: existing public-egress space to deploy the proxy into
 
 ```
 module "egress_proxy" {
-  source = "github.com/GSA-TTS/terraform-cloudgov//egress_proxy?ref=v2.4.0"
+  source = "github.com/GSA-TTS/terraform-cloudgov//egress_proxy?ref=v2.5.0"
 
   cf_org_name     = local.cf_org_name
   cf_egress_space = data.cloudfoundry_space.egress_space
@@ -174,7 +178,7 @@ module "egress_proxy" {
 }
 ```
 
-See <UPGRADING.md> for an example of how to set up network policies and credential stores to enable your client app to reach the proxy.
+See [UPGRADING.md](./UPGRADING.md#egress-proxy) for an example of how to set up network policies and credential stores to enable your client app to reach the proxy.
 
 ### drupal
 
@@ -188,7 +192,7 @@ Find out more at <https://github.com/gsa-tts/drupal-template>
 
 ```
 module "drupal" {
-  source = "github.com/GSA-TTS/terraform-cloudgov//drupal?ref=v2.4.0"
+  source = "github.com/GSA-TTS/terraform-cloudgov//drupal?ref=v2.5.0"
 
   cf_org_name   = local.cf_org_name
   cf_space      = data.cloudfoundry_space.app_space
@@ -218,7 +222,7 @@ Basic example:
 
 ```
 module "database" {
-  source        = "github.com/gsa-tts/terraform-cloudgov//database?ref=v2.4.0"
+  source        = "github.com/gsa-tts/terraform-cloudgov//database?ref=v2.5.0"
   cf_space_id   = data.cloudfoundry_space.space.id
   name          = "spiffworkflow-db"
   tags          = ["rds", "SpiffWorkflow"]
@@ -226,16 +230,16 @@ module "database" {
 }
 
 module "spiffworkflow" {
-  source        = "github.com/GSA-TTS/terraform-cloudgov//spiffworkflow?ref=v2.4.0"
+  source        = "github.com/GSA-TTS/terraform-cloudgov//spiffworkflow?ref=v2.5.0"
   cf_org_name   = var.cf_org_name
   cf_space_name = var.cf_space_name
-  
+
   # Required database instance
   backend_database_service_instance = module.database.database_name
-  
+
   # Choose deployment method: "container" (default) or "buildpack"
   backend_deployment_method = "container"
-  
+
   tags = ["SpiffWorkflow"]
   depends_on = [module.database]
 }
@@ -282,7 +286,7 @@ Creates and deploys an application from source to Cloud Foundry. You must have a
 
 ```
 module "Application" {
-  source               = "github.com/GSA-TTS/terraform-cloudgov//application?ref=v2.4.0"
+  source               = "github.com/GSA-TTS/terraform-cloudgov//application?ref=v2.5.0"
   cf_org_name          = var.cf_org_name
   cf_space_name        = var.cf_space_name
   name                 = local.app_name
@@ -327,7 +331,7 @@ module "logshipper" {
 
 ```tf
 module "logshipper" {
-  source      = "github.com/gsa-tts/terraform-cloudgov//logshipper?ref=v2.4.0"
+  source      = "github.com/gsa-tts/terraform-cloudgov//logshipper?ref=v2.5.0"
   name        = var.name
   cf_org_name = var.cf_org_name
   cf_space = {
