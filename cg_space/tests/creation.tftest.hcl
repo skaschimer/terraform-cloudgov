@@ -1,43 +1,5 @@
 provider "cloudfoundry" {}
 
-override_data {
-  target = data.cloudfoundry_org.org
-  values = {
-    id = "591a8a56-3093-43e7-a21e-1b1b4dbd1c3a"
-  }
-}
-
-override_data {
-  target = data.cloudfoundry_security_group.security_groups
-  values = {
-    id = "b2c3d4e5-f6a7-8901-bcde-f12345678901"
-  }
-}
-
-override_resource {
-  target = cloudfoundry_space.space
-  values = {
-    id   = "31a2c21d-ba50-437b-9d40-8c2d741af9e7"
-    name = "terraform-cloudgov-tf-tests-egress"
-  }
-}
-
-override_resource {
-  target = cloudfoundry_space_role.managers
-}
-
-override_resource {
-  target = cloudfoundry_space_role.developers
-}
-
-override_resource {
-  target = cloudfoundry_space_role.auditors
-}
-
-override_resource {
-  target = cloudfoundry_security_group_space_bindings.security_group_bindings
-}
-
 variables {
   cf_org_name   = "cloud-gov-devtools-development"
   cf_space_name = "terraform-cloudgov-tf-tests-egress"
