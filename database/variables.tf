@@ -26,3 +26,16 @@ variable "json_params" {
   default     = null
   # See options at https://cloud.gov/docs/services/relational-database/#setting-optional-parameters-1
 }
+
+variable "prevent_destroy" {
+  description = <<-EOT
+    Prevent accidental destruction of the database instance. Set to true for
+    production or other persistent environments.
+
+    IMPORTANT: Enabling this on an existing database requires a manual state
+    migration step BEFORE running terraform plan. See UPGRADING.md for details:
+    https://github.com/GSA-TTS/terraform-cloudgov/blob/main/UPGRADING.md#database-prevent_destroy-support
+  EOT
+  type        = bool
+  default     = false
+}

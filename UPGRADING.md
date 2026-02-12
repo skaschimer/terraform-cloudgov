@@ -64,6 +64,35 @@ Follow the steps in the [cloudfoundry provider migration guide](https://github.c
 1. Run: `terraform import module.database.cloudfoundry_service_instance.rds ID_FROM_STEP_3`
 1. Run: `terraform apply` to fill in new computed attributes
 
+## Database: `prevent_destroy` support
+
+The database module now supports a `prevent_destroy` variable (default: `false`) that prevents accidental destruction of the database service instance.
+
+### Step 1: Upgrade to the new module version
+
+This step is the same for everyone. Update your module source ref to the new version and run:
+
+1. `terraform plan` — verify you see only a state address rename (`cloudfoundry_service_instance.rds` → `cloudfoundry_service_instance.rds[0]`) with zero infrastructure changes.
+2. `terraform apply`.
+
+### Step 2 (optional): Enable `prevent_destroy`
+
+If you want to protect a database from accidental destruction, perform this step after completing Step 1.
+
+> ⚠️ **WARNING:** You **must** perform the state move below **before** running `terraform plan`. If you skip it, Terraform will plan to **destroy** the existing database and create a new one. `terraform plan` should clearly show `0 to destroy` if you've done the move correctly — always review plans carefully.
+
+1. Set `prevent_destroy = true` in your module call.
+2. Move the state (replace `<NAME>` with your module's name, e.g., `workflow-db`, `database`):
+
+    ```bash
+    terraform state mv \
+      'module.<NAME>.cloudfoundry_service_instance.rds[0]' \
+      'module.<NAME>.cloudfoundry_service_instance.rds_protected[0]'
+    ```
+
+3. Run `terraform plan` and confirm zero infrastructure changes.
+4. Run `terraform apply`.
+
 ## Module Changes
 
 ### Common Changes
