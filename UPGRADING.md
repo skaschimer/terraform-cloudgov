@@ -68,33 +68,21 @@ Follow the steps in the [cloudfoundry provider migration guide](https://github.c
 
 The database module now supports a `prevent_destroy` variable (default: `false`) that prevents accidental destruction of the database service instance.
 
-### Upgrading existing databases (default behavior, `prevent_destroy = false`)
+### Step 1: Upgrade to the new module version
 
-No action required. The module includes a `moved` block that automatically migrates state from `cloudfoundry_service_instance.rds` to `cloudfoundry_service_instance.rds[0]`. Run `terraform plan` and verify you see only a state address change with zero infrastructure modifications, then `terraform apply`.
+This step is the same for everyone. Update your module source ref to the new version and run:
 
-### Enabling protection on an existing database (`prevent_destroy = true`)
+1. `terraform plan` — verify you see only a state address rename (`cloudfoundry_service_instance.rds` → `cloudfoundry_service_instance.rds[0]`) with zero infrastructure changes.
+2. `terraform apply`.
 
-> ⚠️ **WARNING:** You **must** perform the manual state move below **before** running `terraform plan`. If you skip this step, Terraform will plan to **destroy** the existing database and create a new one. The `terraform plan` output will clearly show `1 to destroy, 1 to add` — always review plans carefully.
+### Step 2 (optional): Enable `prevent_destroy`
 
-1. Update your module source ref to the new version.
-2. Set `prevent_destroy = true` in your module call.
-3. **Before running `terraform plan`**, move the state (replace `<NAME>` with your module's name, e.g., `workflow-db`, `database`):
+If you want to protect a database from accidental destruction, perform this step after completing Step 1.
 
-    ```bash
-    terraform state mv \
-      'module.<NAME>.cloudfoundry_service_instance.rds' \
-      'module.<NAME>.cloudfoundry_service_instance.rds_protected[0]'
-    ```
-
-4. Run `terraform plan` and confirm zero infrastructure changes.
-5. Run `terraform apply`.
-
-### Enabling protection on a database that already upgraded with the default
-
-If you previously upgraded with `prevent_destroy = false` (the default) and later want to enable protection:
+> ⚠️ **WARNING:** You **must** perform the state move below **before** running `terraform plan`. If you skip it, Terraform will plan to **destroy** the existing database and create a new one. `terraform plan` should clearly show `0 to destroy` if you've done the move correctly — always review plans carefully.
 
 1. Set `prevent_destroy = true` in your module call.
-2. Move the state:
+2. Move the state (replace `<NAME>` with your module's name, e.g., `workflow-db`, `database`):
 
     ```bash
     terraform state mv \
@@ -102,7 +90,8 @@ If you previously upgraded with `prevent_destroy = false` (the default) and late
       'module.<NAME>.cloudfoundry_service_instance.rds_protected[0]'
     ```
 
-3. Run `terraform plan`, confirm zero changes, and `terraform apply`.
+3. Run `terraform plan` and confirm zero infrastructure changes.
+4. Run `terraform apply`.
 
 ## Module Changes
 
