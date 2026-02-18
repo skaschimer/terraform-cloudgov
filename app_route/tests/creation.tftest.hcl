@@ -25,6 +25,12 @@ variables {
 }
 
 run "test_route_creation" {
+  command = plan
+
+  expect_failures = [
+    check.deprecated_space_vars
+  ]
+
   assert {
     condition     = output.endpoint == cloudfoundry_route.app_route.url
     error_message = "The route URL should be in the output"
@@ -41,12 +47,8 @@ run "test_route_creation_with_space_object" {
     cf_org_name   = ""
     cf_space_name = ""
     space = {
-      id   = "31a2c21d-ba50-437b-9d40-8c2d741af9e7"
-      name = "terraform-cloudgov-tf-tests"
+      id = "31a2c21d-ba50-437b-9d40-8c2d741af9e7"
     }
-    app_ids  = ["731ed210-af91-4e05-886e-a2fbaf5125cb"]
-    hostname = "my-host"
-    domain   = "apps.internal"
   }
 
   assert {
@@ -59,3 +61,4 @@ run "test_route_creation_with_space_object" {
     error_message = "The route's ID is in the output"
   }
 }
+

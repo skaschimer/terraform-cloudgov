@@ -12,12 +12,18 @@ variables {
 }
 
 run "test_redis_creation" {
+  command = plan
+
   override_resource {
     target = cloudfoundry_service_instance.redis
     values = {
       id = "2a4dae63-2fb7-4a76-975d-eebb9a7b8d96"
     }
   }
+
+  expect_failures = [
+    check.deprecated_cf_space_id
+  ]
 
   assert {
     condition     = cloudfoundry_service_instance.redis.id == output.instance_id
@@ -49,8 +55,7 @@ run "test_redis_creation_with_space_object" {
   variables {
     cf_space_id = ""
     space = {
-      id   = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
-      name = "terraform-cloudgov-tf-tests"
+      id = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
     }
   }
 

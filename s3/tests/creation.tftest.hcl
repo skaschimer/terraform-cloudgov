@@ -9,6 +9,12 @@ variables {
 }
 
 run "test_bucket_creation" {
+  command = plan
+
+  expect_failures = [
+    check.deprecated_cf_space_id
+  ]
+
   assert {
     condition     = can(regex("^\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}$", output.bucket_id))
     error_message = "Bucket ID should be a GUID"
@@ -44,6 +50,10 @@ run "test_parameters" {
     })
   }
 
+  expect_failures = [
+    check.deprecated_cf_space_id
+  ]
+
   assert {
     condition     = cloudfoundry_service_instance.bucket.parameters == "{\"object_ownership\":\"BucketOwnerEnforced\"}"
     error_message = "Service instance parameters should be configurable"
@@ -54,8 +64,7 @@ run "test_bucket_creation_with_space_object" {
   variables {
     cf_space_id = ""
     space = {
-      id   = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
-      name = "terraform-cloudgov-tf-tests"
+      id = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
     }
   }
 

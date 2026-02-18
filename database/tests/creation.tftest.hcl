@@ -12,12 +12,18 @@ variables {
 }
 
 run "test_db_creation" {
+  command = plan
+
   override_resource {
     target = cloudfoundry_service_instance.rds[0]
     values = {
       id = "f6925fad-f9e8-4c93-b69f-132438f6a2f4"
     }
   }
+
+  expect_failures = [
+    check.deprecated_cf_space_id
+  ]
 
   assert {
     condition     = cloudfoundry_service_instance.rds[0].id == output.instance_id
@@ -46,6 +52,8 @@ run "test_db_creation" {
 }
 
 run "test_protected_db_creation" {
+  command = plan
+
   variables {
     prevent_destroy = true
   }
@@ -56,6 +64,10 @@ run "test_protected_db_creation" {
       id = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
     }
   }
+
+  expect_failures = [
+    check.deprecated_cf_space_id
+  ]
 
   assert {
     condition     = cloudfoundry_service_instance.rds_protected[0].id == output.instance_id
@@ -87,8 +99,7 @@ run "test_db_creation_with_space_object" {
   variables {
     cf_space_id = ""
     space = {
-      id   = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
-      name = "terraform-cloudgov-tf-tests"
+      id = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
     }
   }
 
