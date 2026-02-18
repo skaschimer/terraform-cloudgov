@@ -1,5 +1,13 @@
+check "deprecated_cf_space_id" {
+  assert {
+    condition     = var.cf_space_id == ""
+    error_message = "The cf_space_id variable is deprecated. Use the `space` variable instead to pass a cloudfoundry_space resource directly."
+  }
+}
+
 locals {
-  tags = setunion(["terraform-cloudgov-managed"], var.tags)
+  space_id = var.space != null ? var.space.id : var.cf_space_id
+  tags     = setunion(["terraform-cloudgov-managed"], var.tags)
 }
 
 data "cloudfoundry_service_plans" "rds" {
@@ -10,7 +18,7 @@ data "cloudfoundry_service_plans" "rds" {
 resource "cloudfoundry_service_instance" "rds" {
   count        = var.prevent_destroy ? 0 : 1
   name         = var.name
-  space        = var.cf_space_id
+  space        = local.space_id
   type         = "managed"
   service_plan = data.cloudfoundry_service_plans.rds.service_plans.0.id
   tags         = local.tags
@@ -20,7 +28,7 @@ resource "cloudfoundry_service_instance" "rds" {
 resource "cloudfoundry_service_instance" "rds_protected" {
   count        = var.prevent_destroy ? 1 : 0
   name         = var.name
-  space        = var.cf_space_id
+  space        = local.space_id
   type         = "managed"
   service_plan = data.cloudfoundry_service_plans.rds.service_plans.0.id
   tags         = local.tags

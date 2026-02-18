@@ -49,3 +49,23 @@ run "test_parameters" {
     error_message = "Service instance parameters should be configurable"
   }
 }
+
+run "test_bucket_creation_with_space_object" {
+  variables {
+    cf_space_id = ""
+    space = {
+      id   = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
+      name = "terraform-cloudgov-tf-tests"
+    }
+  }
+
+  assert {
+    condition     = cloudfoundry_service_instance.bucket.id == output.bucket_id
+    error_message = "Bucket ID output must match the service instance"
+  }
+
+  assert {
+    condition     = cloudfoundry_service_instance.bucket.name == var.name
+    error_message = "Service instance name should match the name variable"
+  }
+}

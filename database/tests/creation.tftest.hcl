@@ -82,3 +82,30 @@ run "test_protected_db_creation" {
     error_message = "Service instance json_params should be configurable"
   }
 }
+
+run "test_db_creation_with_space_object" {
+  variables {
+    cf_space_id = ""
+    space = {
+      id   = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
+      name = "terraform-cloudgov-tf-tests"
+    }
+  }
+
+  override_resource {
+    target = cloudfoundry_service_instance.rds[0]
+    values = {
+      id = "f6925fad-f9e8-4c93-b69f-132438f6a2f4"
+    }
+  }
+
+  assert {
+    condition     = cloudfoundry_service_instance.rds[0].id == output.instance_id
+    error_message = "Instance ID output must match the service instance"
+  }
+
+  assert {
+    condition     = cloudfoundry_service_instance.rds[0].name == var.name
+    error_message = "Service instance name should match the name variable"
+  }
+}
