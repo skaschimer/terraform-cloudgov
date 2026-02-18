@@ -16,8 +16,8 @@
 module "connector_route" {
   source = "../app_route"
 
+  space         = var.space
   cf_org_name   = var.cf_org_name
-  cf_space_name = var.cf_space_name
   domain        = "apps.internal"
   hostname      = "${local.prefix}-connector"
   app_ids       = [cloudfoundry_app.connector.id]
@@ -26,8 +26,8 @@ module "connector_route" {
 module "frontend_route" {
   source = "../app_route"
 
+  space         = var.space
   cf_org_name   = var.cf_org_name
-  cf_space_name = var.cf_space_name
   hostname      = local.prefix
   app_ids       = [cloudfoundry_app.frontend.id]
 }
@@ -35,8 +35,8 @@ module "frontend_route" {
 module "backend_route" {
   source = "../app_route"
 
+  space         = var.space
   cf_org_name   = var.cf_org_name
-  cf_space_name = var.cf_space_name
   hostname      = local.prefix
   path          = "/api"
 }
