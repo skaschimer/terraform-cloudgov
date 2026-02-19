@@ -2,7 +2,9 @@ provider "cloudfoundry" {}
 
 variables {
   # this is the ID of the terraform-cloudgov-tf-tests space
-  cf_space_id   = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
+  space = {
+    id = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
+  }
   rds_plan_name = "micro-psql"
   name          = "terraform-cloudgov-rds-test"
   tags          = ["terraform-cloudgov-managed", "tests"]
@@ -11,8 +13,13 @@ variables {
   })
 }
 
-run "test_db_creation" {
+run "test_db_creation_deprecated" {
   command = plan
+
+  variables {
+    cf_space_id = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
+    space       = null
+  }
 
   override_resource {
     target = cloudfoundry_service_instance.rds[0]
@@ -51,10 +58,12 @@ run "test_db_creation" {
   }
 }
 
-run "test_protected_db_creation" {
+run "test_protected_db_creation_deprecated" {
   command = plan
 
   variables {
+    cf_space_id     = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
+    space           = null
     prevent_destroy = true
   }
 
@@ -95,12 +104,9 @@ run "test_protected_db_creation" {
   }
 }
 
-run "test_db_creation_with_space_object" {
+run "test_db_creation" {
   variables {
     cf_space_id = ""
-    space = {
-      id = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
-    }
   }
 
   override_resource {
