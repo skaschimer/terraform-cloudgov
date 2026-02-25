@@ -1,6 +1,17 @@
+check "deprecated_cf_space_name" {
+  assert {
+    condition     = var.cf_space_name == ""
+    error_message = "The cf_space_name variable is deprecated. Use the `space` variable instead to pass a cloudfoundry_space resource directly."
+  }
+}
+
+locals {
+  space_name = var.space != null ? var.space.name : var.cf_space_name
+}
+
 resource "cloudfoundry_app" "clamav_api" {
   name       = var.name
-  space_name = var.cf_space_name
+  space_name = local.space_name
   org_name   = var.cf_org_name
 
   memory                          = var.clamav_memory
@@ -25,9 +36,8 @@ resource "cloudfoundry_app" "clamav_api" {
 module "route" {
   source = "../app_route"
 
-  cf_org_name   = var.cf_org_name
-  cf_space_name = var.cf_space_name
-  domain        = "apps.internal"
-  hostname      = var.name
-  app_ids       = [cloudfoundry_app.clamav_api.id]
+  space    = var.space
+  domain   = "apps.internal"
+  hostname = var.name
+  app_ids  = [cloudfoundry_app.clamav_api.id]
 }
