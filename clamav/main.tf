@@ -5,14 +5,35 @@ check "deprecated_cf_space_name" {
   }
 }
 
+data "cloudfoundry_org" "org" {
+  count = var.space == null ? 1 : 0
+  name  = var.cf_org_name
+}
+
+data "cloudfoundry_space" "space" {
+  count = var.space == null ? 1 : 0
+  name  = var.cf_space_name
+  org   = data.cloudfoundry_org.org[0].id
+}
+
 locals {
-  space_name = var.space != null ? var.space.name : var.cf_space_name
+  space = var.space != null ? var.space : {
+    id   = data.cloudfoundry_space.space[0].id
+    name = var.cf_space_name
+  }
 }
 
 resource "cloudfoundry_app" "clamav_api" {
   name       = var.name
-  space_name = local.space_name
+  space_name = local.space.name
   org_name   = var.cf_org_name
+
+  lifecycle {
+    precondition {
+      condition     = var.space != null || var.cf_space_name != ""
+      error_message = "You must provide either the `space` variable or the deprecated `cf_space_name` variable."
+    }
+  }
 
   memory                          = var.clamav_memory
   disk_quota                      = "2048M"
@@ -36,7 +57,7 @@ resource "cloudfoundry_app" "clamav_api" {
 module "route" {
   source = "../app_route"
 
-  space    = var.space
+  space    = local.space
   domain   = "apps.internal"
   hostname = var.name
   app_ids  = [cloudfoundry_app.clamav_api.id]
