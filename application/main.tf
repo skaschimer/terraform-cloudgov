@@ -9,9 +9,20 @@ data "external" "app_zip" {
   }
 }
 
+check "deprecated_cf_space_name" {
+  assert {
+    condition     = var.cf_space_name == ""
+    error_message = "The cf_space_name variable is deprecated. Use the `space` variable instead to pass a cloudfoundry_space resource directly."
+  }
+}
+
+locals {
+  space_name = var.space != null ? var.space.name : var.cf_space_name
+}
+
 resource "cloudfoundry_app" "application" {
   name       = var.name
-  space_name = var.cf_space_name
+  space_name = local.space_name
   org_name   = var.cf_org_name
 
   path             = "${path.module}/${data.external.app_zip.result.path}"
@@ -37,9 +48,8 @@ resource "cloudfoundry_app" "application" {
 module "route" {
   source = "../app_route"
 
-  cf_org_name   = var.cf_org_name
-  cf_space_name = var.cf_space_name
-  domain        = var.domain
-  hostname      = coalesce(var.hostname, var.name)
-  app_ids       = [cloudfoundry_app.application.id]
+  space    = var.space
+  domain   = var.domain
+  hostname = coalesce(var.hostname, var.name)
+  app_ids  = [cloudfoundry_app.application.id]
 }
