@@ -5,7 +5,14 @@ variable "cf_org_name" {
 
 variable "cf_space_name" {
   type        = string
-  description = "cloud.gov space name"
+  description = "cloud.gov space name (deprecated; use `space` instead.)"
+  default     = ""
+}
+
+variable "space" {
+  type        = object({ id = string, name = string })
+  description = "A cloudfoundry_space resource (or any object with .id and .name). When provided, cf_space_name is not used."
+  default     = null
 }
 
 variable "name" {

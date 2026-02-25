@@ -154,7 +154,7 @@ resource "archive_file" "code" {
 resource "cloudfoundry_app" "backend" {
   name       = "${local.prefix}-backend"
   org_name   = var.cf_org_name
-  space_name = var.cf_space_name
+  space_name = var.space.name
 
   # Conditional properties based on deployment method
   buildpacks = var.backend_deployment_method == "buildpack" ? ["python_buildpack"] : null

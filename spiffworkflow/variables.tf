@@ -3,9 +3,12 @@ variable "cf_org_name" {
   description = "cloud.gov organization name"
 }
 
-variable "cf_space_name" {
-  type        = string
-  description = "cloud.gov space in which to deploy the apps"
+variable "space" {
+  type = object({
+    id   = string
+    name = string
+  })
+  description = "A cloudfoundry_space resource (or any object with .id and .name)."
 }
 
 variable "name" {

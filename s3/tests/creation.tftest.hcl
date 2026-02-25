@@ -2,13 +2,48 @@ provider "cloudfoundry" {}
 
 variables {
   # this is the ID of the terraform-cloudgov-tf-tests space
-  cf_space_id  = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
+  space = {
+    id = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
+  }
   s3_plan_name = "basic-sandbox"
   name         = "terraform-cloudgov-s3-test"
   tags         = ["terraform-cloudgov-managed", "tests"]
 }
 
+run "test_bucket_creation_deprecated" {
+  command = plan
+
+  variables {
+    cf_space_id = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
+    space       = null
+  }
+
+  expect_failures = [
+    check.deprecated_cf_space_id
+  ]
+}
+
+run "test_parameters_deprecated" {
+  command = plan
+
+  variables {
+    cf_space_id = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
+    space       = null
+    json_params = jsonencode({
+      object_ownership = "BucketOwnerEnforced"
+    })
+  }
+
+  expect_failures = [
+    check.deprecated_cf_space_id
+  ]
+}
+
 run "test_bucket_creation" {
+  variables {
+    cf_space_id = ""
+  }
+
   assert {
     condition     = can(regex("^\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}$", output.bucket_id))
     error_message = "Bucket ID should be a GUID"

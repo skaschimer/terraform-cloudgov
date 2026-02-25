@@ -107,9 +107,8 @@ resource "random_pet" "random_route" {
 module "route" {
   source = "../app_route"
 
-  cf_org_name   = var.cf_org_name
-  cf_space_name = var.cf_space.name
-  domain        = var.domain
-  hostname      = coalesce(var.hostname, random_pet.random_route.id)
-  app_ids       = [cloudfoundry_app.logshipper.id]
+  space    = var.cf_space
+  domain   = var.domain
+  hostname = coalesce(var.hostname, random_pet.random_route.id)
+  app_ids  = [cloudfoundry_app.logshipper.id]
 }

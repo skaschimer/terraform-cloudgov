@@ -34,8 +34,11 @@ mock_provider "docker" {
 }
 
 variables {
-  cf_org_name                       = "cloud-gov-devtools-development"
-  cf_space_name                     = "terraform-cloudgov-tf-tests"
+  cf_org_name = "cloud-gov-devtools-development"
+  space = {
+    id   = "31a2c21d-ba50-437b-9d40-8c2d741af9e7"
+    name = "terraform-cloudgov-tf-tests"
+  }
   process_models_ssh_key            = ""
   backend_database_service_instance = "spiffworkflow-db"
   name                              = "spiffworkflow-backend"
@@ -83,5 +86,20 @@ run "test_spiff_instances" {
   assert {
     condition     = cloudfoundry_app.backend.health_check_http_endpoint == var.health_check_endpoint
     error_message = "Health check endpoint must match backend health check endpoint"
+  }
+}
+
+run "test_spiff_instances_with_space_object" {
+  assert {
+    condition     = cloudfoundry_app.connector.name == "${var.name}-connector"
+    error_message = "Connector App name should be ${var.name}-connector"
+  }
+  assert {
+    condition     = cloudfoundry_app.backend.name == "${var.name}-backend"
+    error_message = "Backend App name should be ${var.name}-backend"
+  }
+  assert {
+    condition     = cloudfoundry_app.frontend.name == "${var.name}-frontend"
+    error_message = "Frontend App name should be ${var.name}-frontend"
   }
 }

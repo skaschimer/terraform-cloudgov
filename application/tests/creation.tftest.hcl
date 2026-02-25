@@ -17,8 +17,11 @@ mock_provider "cloudfoundry" {
 }
 
 variables {
-  cf_org_name          = "cloud-gov-devtools-development"
-  cf_space_name        = "terraform-cloudgov-tf-tests"
+  cf_org_name = "cloud-gov-devtools-development"
+  space = {
+    id   = "31a2c21d-ba50-437b-9d40-8c2d741af9e7"
+    name = "terraform-cloudgov-tf-tests"
+  }
   name                 = "fac-app"
   github_org_name      = "gsa-tts"
   github_repo_name     = "fac"
@@ -44,6 +47,19 @@ variables {
     ENV_VAR  = "1"
     ENV_VAR2 = "2"
   }
+}
+
+run "application_tests_deprecated" {
+  command = plan
+
+  variables {
+    cf_space_name = "terraform-cloudgov-tf-tests"
+    space         = null
+  }
+
+  expect_failures = [
+    check.deprecated_cf_space_name
+  ]
 }
 
 run "application_tests" {

@@ -2,7 +2,9 @@ provider "cloudfoundry" {}
 
 variables {
   # this is the ID of the terraform-cloudgov-tf-tests space
-  cf_space_id     = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
+  space = {
+    id = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
+  }
   redis_plan_name = "redis-dev"
   name            = "terraform-cloudgov-redis-test"
   tags            = ["terraform-cloudgov-managed", "tests"]
@@ -11,7 +13,31 @@ variables {
   })
 }
 
+run "test_redis_creation_deprecated" {
+  command = plan
+
+  variables {
+    cf_space_id = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
+    space       = null
+  }
+
+  override_resource {
+    target = cloudfoundry_service_instance.redis
+    values = {
+      id = "2a4dae63-2fb7-4a76-975d-eebb9a7b8d96"
+    }
+  }
+
+  expect_failures = [
+    check.deprecated_cf_space_id
+  ]
+}
+
 run "test_redis_creation" {
+  variables {
+    cf_space_id = ""
+  }
+
   override_resource {
     target = cloudfoundry_service_instance.redis
     values = {

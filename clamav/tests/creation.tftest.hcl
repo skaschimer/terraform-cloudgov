@@ -17,11 +17,27 @@ mock_provider "cloudfoundry" {
 }
 
 variables {
-  cf_org_name   = "cloud-gov-devtools-development"
-  cf_space_name = "terraform-cloudgov-tf-tests"
+  cf_org_name = "cloud-gov-devtools-development"
+  space = {
+    id   = "31a2c21d-ba50-437b-9d40-8c2d741af9e7"
+    name = "terraform-cloudgov-tf-tests"
+  }
   name          = "terraform-cloudgov-clamav-test"
   clamav_image  = "ghcr.io/gsa-tts/clamav-rest/clamav:TAG"
   max_file_size = "30M"
+}
+
+run "test_app_creation_deprecated" {
+  command = plan
+
+  variables {
+    cf_space_name = "terraform-cloudgov-tf-tests"
+    space         = null
+  }
+
+  expect_failures = [
+    check.deprecated_cf_space_name
+  ]
 }
 
 run "test_app_creation" {

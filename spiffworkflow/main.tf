@@ -44,7 +44,7 @@ data "docker_registry_image" "connector" {
 resource "cloudfoundry_app" "connector" {
   name                       = "${local.prefix}-connector"
   org_name                   = var.cf_org_name
-  space_name                 = var.cf_space_name
+  space_name                 = var.space.name
   docker_image               = "${local.connector_baseimage}@${data.docker_registry_image.connector.sha256_digest}"
   memory                     = var.connector_memory
   instances                  = var.connector_instances
@@ -74,7 +74,7 @@ data "docker_registry_image" "frontend" {
 resource "cloudfoundry_app" "frontend" {
   name              = "${local.prefix}-frontend"
   org_name          = var.cf_org_name
-  space_name        = var.cf_space_name
+  space_name        = var.space.name
   docker_image      = "${local.frontend_baseimage}@${data.docker_registry_image.frontend.sha256_digest}"
   memory            = var.frontend_memory
   instances         = var.frontend_instances

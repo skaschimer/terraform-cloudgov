@@ -16,29 +16,26 @@
 module "connector_route" {
   source = "../app_route"
 
-  cf_org_name   = var.cf_org_name
-  cf_space_name = var.cf_space_name
-  domain        = "apps.internal"
-  hostname      = "${local.prefix}-connector"
-  app_ids       = [cloudfoundry_app.connector.id]
+  space    = var.space
+  domain   = "apps.internal"
+  hostname = "${local.prefix}-connector"
+  app_ids  = [cloudfoundry_app.connector.id]
 }
 
 module "frontend_route" {
   source = "../app_route"
 
-  cf_org_name   = var.cf_org_name
-  cf_space_name = var.cf_space_name
-  hostname      = local.prefix
-  app_ids       = [cloudfoundry_app.frontend.id]
+  space    = var.space
+  hostname = local.prefix
+  app_ids  = [cloudfoundry_app.frontend.id]
 }
 
 module "backend_route" {
   source = "../app_route"
 
-  cf_org_name   = var.cf_org_name
-  cf_space_name = var.cf_space_name
-  hostname      = local.prefix
-  path          = "/api"
+  space    = var.space
+  hostname = local.prefix
+  path     = "/api"
 }
 
 # -----------------------------------------------------------------------------

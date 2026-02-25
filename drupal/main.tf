@@ -8,7 +8,7 @@ locals {
 module "database" {
   source = "../database"
 
-  cf_space_id   = var.cf_space.id
+  space         = var.cf_space
   name          = local.rds_name
   rds_plan_name = var.rds_plan_name
   tags          = setunion(local.tags, ["drupal-db"])
@@ -17,7 +17,7 @@ module "database" {
 module "bucket" {
   source = "../s3"
 
-  cf_space_id  = var.cf_space.id
+  space        = var.cf_space
   name         = local.s3_name
   s3_plan_name = var.s3_plan_name
   tags         = setunion(local.tags, ["drupal-bucket"])
