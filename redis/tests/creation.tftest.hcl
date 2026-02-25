@@ -31,6 +31,19 @@ run "test_redis_creation_deprecated" {
   expect_failures = [
     check.deprecated_cf_space_id
   ]
+}
+
+run "test_redis_creation" {
+  variables {
+    cf_space_id = ""
+  }
+
+  override_resource {
+    target = cloudfoundry_service_instance.redis
+    values = {
+      id = "2a4dae63-2fb7-4a76-975d-eebb9a7b8d96"
+    }
+  }
 
   assert {
     condition     = cloudfoundry_service_instance.redis.id == output.instance_id
@@ -55,28 +68,5 @@ run "test_redis_creation_deprecated" {
   assert {
     condition     = cloudfoundry_service_instance.redis.parameters == "{\"engineVersion\":\"7.0\"}"
     error_message = "Service instance parameters should be configurable"
-  }
-}
-
-run "test_redis_creation" {
-  variables {
-    cf_space_id = ""
-  }
-
-  override_resource {
-    target = cloudfoundry_service_instance.redis
-    values = {
-      id = "2a4dae63-2fb7-4a76-975d-eebb9a7b8d96"
-    }
-  }
-
-  assert {
-    condition     = cloudfoundry_service_instance.redis.id == output.instance_id
-    error_message = "Instance ID output must match the service instance"
-  }
-
-  assert {
-    condition     = cloudfoundry_service_instance.redis.name == var.name
-    error_message = "Service instance name should match the name variable"
   }
 }

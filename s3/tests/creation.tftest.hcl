@@ -21,6 +21,28 @@ run "test_bucket_creation_deprecated" {
   expect_failures = [
     check.deprecated_cf_space_id
   ]
+}
+
+run "test_parameters_deprecated" {
+  command = plan
+
+  variables {
+    cf_space_id = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
+    space       = null
+    json_params = jsonencode({
+      object_ownership = "BucketOwnerEnforced"
+    })
+  }
+
+  expect_failures = [
+    check.deprecated_cf_space_id
+  ]
+}
+
+run "test_bucket_creation" {
+  variables {
+    cf_space_id = ""
+  }
 
   assert {
     condition     = can(regex("^\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}$", output.bucket_id))
@@ -48,39 +70,17 @@ run "test_bucket_creation_deprecated" {
   }
 }
 
-run "test_parameters_deprecated" {
+run "test_parameters" {
   command = plan
 
   variables {
-    cf_space_id = "f23cbf69-66a1-4b1d-83d4-e497abdb8dcb"
-    space       = null
     json_params = jsonencode({
       object_ownership = "BucketOwnerEnforced"
     })
   }
 
-  expect_failures = [
-    check.deprecated_cf_space_id
-  ]
-
   assert {
     condition     = cloudfoundry_service_instance.bucket.parameters == "{\"object_ownership\":\"BucketOwnerEnforced\"}"
     error_message = "Service instance parameters should be configurable"
-  }
-}
-
-run "test_bucket_creation" {
-  variables {
-    cf_space_id = ""
-  }
-
-  assert {
-    condition     = cloudfoundry_service_instance.bucket.id == output.bucket_id
-    error_message = "Bucket ID output must match the service instance"
-  }
-
-  assert {
-    condition     = cloudfoundry_service_instance.bucket.name == var.name
-    error_message = "Service instance name should match the name variable"
   }
 }

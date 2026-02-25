@@ -37,16 +37,6 @@ run "test_route_creation_deprecated" {
   expect_failures = [
     check.deprecated_space_vars
   ]
-
-  assert {
-    condition     = output.endpoint == cloudfoundry_route.app_route.url
-    error_message = "The route URL should be in the output"
-  }
-
-  assert {
-    condition     = output.route_id == cloudfoundry_route.app_route.id
-    error_message = "The route's ID is in the output"
-  }
 }
 
 run "test_route_creation" {
