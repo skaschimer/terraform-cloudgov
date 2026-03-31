@@ -9,6 +9,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     name: Integration test
+    concurrency:
+      group: terraform-test-${{ matrix.module }}
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -29,6 +31,8 @@ jobs:
   test-with-zip:
     runs-on: ubuntu-latest
     name: Integration test with zip
+    concurrency:
+      group: terraform-test-${{ matrix.module }}
     strategy:
       fail-fast: false
       max-parallel: 1
