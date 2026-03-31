@@ -5,6 +5,11 @@ on:
     branches-ignore:
       - main
 
+# Security: restrict GITHUB_TOKEN to least privilege.
+# See: https://www.upwind.io/feed/hackerbot-claw-github-actions-pull-request-rce
+permissions:
+  contents: read
+
 jobs:
   validate:
     runs-on: ubuntu-latest
