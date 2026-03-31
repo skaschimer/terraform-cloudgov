@@ -98,6 +98,16 @@ run "test_protected_db_creation" {
     prevent_destroy = true
   }
 
+  # The previous run created rds[0] in state. With prevent_destroy = true,
+  # count drops to 0 and Terraform must destroy it. An override is needed
+  # so the provider can read the resource during teardown.
+  override_resource {
+    target = cloudfoundry_service_instance.rds[0]
+    values = {
+      id = "f6925fad-f9e8-4c93-b69f-132438f6a2f4"
+    }
+  }
+
   override_resource {
     target = cloudfoundry_service_instance.rds_protected[0]
     values = {
